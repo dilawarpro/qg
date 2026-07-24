@@ -261,7 +261,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 
 /* ===== Template: Teal Band ===== */
 .doc-tealband{background:#fff;font-family:'Inter',sans-serif;min-height:100%;display:flex;flex-direction:column;overflow:hidden;}
-.doc-tealband .band{background:var(--teal);color:#fff;padding:1.5rem 1.7rem;}
+.doc-tealband .band{background:var(--teal);color:#fff;padding:1.5rem 1.7rem;display:flex;justify-content:space-between;align-items:flex-start;}
 .doc-tealband .band .doc-title{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:700;}
 .doc-tealband .band .eyebrow{font-size:.72rem;opacity:.85;margin-top:.15rem;}
 .doc-tealband .band .meta{font-family:'JetBrains Mono',monospace;font-size:.7rem;text-align:right;opacity:.9;}
@@ -297,7 +297,29 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-typewriter .thankyou{text-align:center;font-weight:700;margin-top:1rem;font-size:.85rem;letter-spacing:.03em;}
 .doc-typewriter .footer-note{text-align:center;font-size:.7rem;color:var(--slate);margin-top:.4rem;}
 
-@media(max-width:991px){.preview-wrap{position:static;margin-top:1.5rem;} .tpl-card{width:calc(50% - .4rem);}}
+/* ---------- Mobile Responsiveness for Live Preview ---------- */
+@media(max-width:991px){
+  .preview-wrap{position:static;margin-top:1.5rem;} 
+  .tpl-card{width:calc(50% - .4rem);}
+}
+@media(max-width:576px){
+  /* Fix Teal Band layout on mobile */
+  .doc-tealband .band{flex-direction:column;gap:.5rem;}
+  .doc-tealband .band .meta{text-align:left;}
+  
+  /* Fix Corporate layout on mobile */
+  .doc-corporate .band{flex-direction:column;align-items:flex-start;gap:.5rem;}
+  .doc-corporate .band .meta{text-align:left;}
+  
+  /* Reduce padding on Receipt card to give text more room */
+  .doc-receipt{padding:1rem;}
+  .doc-receipt .card{padding:1.2rem 1rem;}
+  
+  /* General padding reduction for narrow screens */
+  .doc-minimal, .doc-bold{padding:1.5rem 1.2rem;}
+  .doc-corporate .body-pad, .doc-tealband .body-pad{padding:1.2rem;}
+}
+
 </style>
 </head>
 <body>
@@ -1048,9 +1070,17 @@ textarea#bulkKeywords{font-size:.85rem;}
     
     if(!target) throw new Error("Preview not ready");
     
+    // Temporarily remove overflow constraints to capture full height
     const originalWrapperOverflow = targetWrapper.style.overflow;
     targetWrapper.style.overflow = 'visible';
     
+    // FORCE DESKTOP WIDTH: Temporarily set width to 800px to prevent mobile squishing in PDFs
+    const originalWrapperWidth = targetWrapper.style.width;
+    const originalWrapperMaxWidth = targetWrapper.style.maxWidth;
+    targetWrapper.style.width = '800px';
+    targetWrapper.style.maxWidth = '800px';
+    
+    // Wait for fonts to be ready to avoid blank text in canvas
     if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
@@ -1076,21 +1106,18 @@ textarea#bulkKeywords{font-size:.85rem;}
       const jsPDF = window.jspdf?.jsPDF || window.jspdf;
       if (!jsPDF) throw new Error("jsPDF library not loaded");
       
-      // FIXED: Custom Page Size to eliminate ALL white space
-      // Define target width in mm (Standard A4 width is 210mm)
+      // Custom Page Size to eliminate ALL white space
       const pageW = 210; 
-      // Calculate exact height based on aspect ratio so there is 0 top/bottom white space
       const pageH = (canvas.height * pageW) / canvas.width;
-      
-      // Create PDF with exact dimensions matching the canvas aspect ratio
       const pdf = new jsPDF({orientation: 'p', unit: 'mm', format: [pageW, pageH], compress: true});
-      
-      // Add image filling 100% of the page from 0,0
       pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST');
       
       return pdf;
     } finally {
+      // Restore original styles so the live mobile preview goes back to normal
       targetWrapper.style.overflow = originalWrapperOverflow;
+      targetWrapper.style.width = originalWrapperWidth;
+      targetWrapper.style.maxWidth = originalWrapperMaxWidth;
     }
   }
 
