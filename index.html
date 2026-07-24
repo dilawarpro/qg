@@ -261,7 +261,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 
 /* ===== Template: Teal Band ===== */
 .doc-tealband{background:#fff;font-family:'Inter',sans-serif;min-height:100%;display:flex;flex-direction:column;overflow:hidden;}
-.doc-tealband .band{background:var(--teal);color:#fff;padding:1.5rem 1.7rem;display:flex;justify-content:space-between;align-items:flex-start;}
+.doc-tealband .band{background:var(--teal);color:#fff;padding:1.5rem 1.7rem;}
 .doc-tealband .band .doc-title{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:700;}
 .doc-tealband .band .eyebrow{font-size:.72rem;opacity:.85;margin-top:.15rem;}
 .doc-tealband .band .meta{font-family:'JetBrains Mono',monospace;font-size:.7rem;text-align:right;opacity:.9;}
@@ -297,35 +297,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-typewriter .thankyou{text-align:center;font-weight:700;margin-top:1rem;font-size:.85rem;letter-spacing:.03em;}
 .doc-typewriter .footer-note{text-align:center;font-size:.7rem;color:var(--slate);margin-top:.4rem;}
 
-/* ---------- Mobile Responsiveness for Live Preview ---------- */
-@media(max-width:991px){
-  .preview-wrap{position:static;margin-top:1.5rem;} 
-  .tpl-card{width:calc(50% - .4rem);}
-}
-@media(max-width:576px){
-  /* Fix Teal Band layout on mobile */
-  .doc-tealband .band{flex-direction:column;gap:.5rem;}
-  .doc-tealband .band .meta{text-align:left;}
-  
-  /* Fix Corporate layout on mobile */
-  .doc-corporate .band{flex-direction:column;align-items:flex-start;gap:.5rem;}
-  .doc-corporate .band .meta{text-align:left;}
-  
-  /* Fix Receipt Card layout on mobile */
-  .doc-receipt{padding:.5rem;}
-  .doc-receipt .card{padding:1.2rem 1rem; overflow: visible;}
-  .doc-receipt .doc-title{font-size:1.2rem;}
-  .doc-receipt .d-flex.justify-content-between{
-    flex-direction: column;
-    align-items: flex-start;
-    gap: .5rem;
-  }
-  
-  /* General padding reduction for narrow screens */
-  .doc-minimal, .doc-bold{padding:1.5rem 1.2rem;}
-  .doc-corporate .body-pad, .doc-tealband .body-pad{padding:1.2rem;}
-}
-
+@media(max-width:991px){.preview-wrap{position:static;margin-top:1.5rem;} .tpl-card{width:calc(50% - .4rem);}}
 </style>
 </head>
 <body>
@@ -502,6 +474,16 @@ textarea#bulkKeywords{font-size:.85rem;}
         </div>
       </div>
 
+      <div class="panel action-btns">
+        <h2><span class="step-num">8</span> Export &amp; Share</h2>
+        <div class="d-flex flex-wrap gap-2">
+          <button class="btn btn-primary" id="downloadPdfBtn" type="button"><i class="bi bi-download me-1"></i> Download PDF</button>
+          <button class="btn btn-share" id="sharePdfBtn" type="button"><i class="bi bi-share-fill me-1"></i> Share PDF</button>
+        </div>
+        <div id="pdfStatus" class="mt-2" style="font-size:.8rem;color:var(--slate);"></div>
+        <div class="mt-1" style="font-size:.72rem;color:var(--slate);">Sharing sends the quote as a PDF file only — never as plain text.</div>
+      </div>
+
     </div>
 
     <!-- ============ PREVIEW COLUMN ============ -->
@@ -515,18 +497,6 @@ textarea#bulkKeywords{font-size:.85rem;}
     </div>
 
   </div>
-
-  <!-- ============ EXPORT & SHARE SECTION (MOVED TO BOTTOM) ============ -->
-  <div class="panel action-btns mt-4">
-    <h2><span class="step-num">8</span> Export &amp; Share</h2>
-    <div class="d-flex flex-wrap gap-2">
-      <button class="btn btn-primary" id="downloadPdfBtn" type="button"><i class="bi bi-download me-1"></i> Download PDF</button>
-      <button class="btn btn-share" id="sharePdfBtn" type="button"><i class="bi bi-share-fill me-1"></i> Share PDF</button>
-    </div>
-    <div id="pdfStatus" class="mt-2" style="font-size:.8rem;color:var(--slate);"></div>
-    <div class="mt-1" style="font-size:.72rem;color:var(--slate);">Sharing sends the quote as a PDF file only — never as plain text.</div>
-  </div>
-
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
@@ -1078,21 +1048,15 @@ textarea#bulkKeywords{font-size:.85rem;}
     
     if(!target) throw new Error("Preview not ready");
     
-    // Wait for fonts to be ready
+    const originalWrapperOverflow = targetWrapper.style.overflow;
+    targetWrapper.style.overflow = 'visible';
+    
     if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
     
-    // Create a clone for rendering to avoid affecting live layout on mobile
-    const clone = target.cloneNode(true);
-    clone.style.width = '800px'; // Force desktop width
-    clone.style.position = 'absolute';
-    clone.style.left = '-9999px';
-    clone.style.top = '0';
-    document.body.appendChild(clone);
-    
     try {
-      const targetHeight = clone.offsetHeight;
+      const targetHeight = target.offsetHeight;
       const maxCanvasHeight = 5000; 
       let scale = 2;
       if (targetHeight * scale > maxCanvasHeight) {
@@ -1100,30 +1064,33 @@ textarea#bulkKeywords{font-size:.85rem;}
       }
       if (scale < 1) scale = 1;
       
-      const canvas = await html2canvas(clone, {
+      const canvas = await html2canvas(target, {
           scale: scale,
           useCORS: true,
           backgroundColor: '#FFFFFF',
           logging: false
       });
       
-      document.body.removeChild(clone); // Clean up
-      
       const imgData = canvas.toDataURL('image/jpeg', 0.95); 
       
       const jsPDF = window.jspdf?.jsPDF || window.jspdf;
       if (!jsPDF) throw new Error("jsPDF library not loaded");
       
-      // Custom Page Size to eliminate ALL white space
+      // FIXED: Custom Page Size to eliminate ALL white space
+      // Define target width in mm (Standard A4 width is 210mm)
       const pageW = 210; 
+      // Calculate exact height based on aspect ratio so there is 0 top/bottom white space
       const pageH = (canvas.height * pageW) / canvas.width;
+      
+      // Create PDF with exact dimensions matching the canvas aspect ratio
       const pdf = new jsPDF({orientation: 'p', unit: 'mm', format: [pageW, pageH], compress: true});
+      
+      // Add image filling 100% of the page from 0,0
       pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST');
       
       return pdf;
-    } catch (err) {
-        if(clone.parentNode) document.body.removeChild(clone); // Ensure cleanup on error
-        throw err;
+    } finally {
+      targetWrapper.style.overflow = originalWrapperOverflow;
     }
   }
 
