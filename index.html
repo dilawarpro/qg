@@ -172,7 +172,6 @@ textarea#bulkKeywords{font-size:.85rem;}
   font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--slate);
   text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem;
 }
-/* FIXED: Removed aspect-ratio to allow infinite height so backgrounds don't cut off */
 #quoteDoc{
   width:100%;
   min-height:600px;
@@ -194,7 +193,6 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-tealband .included-grid .item i,.doc-typewriter .included-grid .item i{color:var(--teal);}
 
 /* ===== Template: Minimal ===== */
-/* FIXED: Changed height:100% to min-height:100% for all templates */
 .doc-minimal{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;padding:2.2rem 2rem;min-height:100%;}
 .doc-minimal .doc-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--ink);padding-bottom:1rem;margin-bottom:1.2rem;}
 .doc-minimal .doc-title{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;}
@@ -839,11 +837,10 @@ textarea#bulkKeywords{font-size:.85rem;}
       return html;
     }
     if(type === 'corporate'){
-      let html = '<table>';
+      let html = '';
       d.customFields.forEach(f => {
         html += `<tr><td>${f.label}</td><td>${f.value || '—'}</td></tr>`;
       });
-      html += '</table>';
       return html;
     }
     
@@ -1051,27 +1048,37 @@ textarea#bulkKeywords{font-size:.85rem;}
     await new Promise(r => setTimeout(r, 50)); 
     
     const canvas = await html2canvas(target, {scale:2, useCORS:true, backgroundColor: '#ffffff'});
-    const imgData = canvas.toDataURL('image/png');
+    
+    // Using JPEG at 100% quality reduces file size significantly compared to PNG while keeping it visually lossless
+    const imgData = canvas.toDataURL('image/jpeg', 1.0); 
+    
     const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p','mm','a4');
+    // compress: true compresses the PDF streams for smaller file size
+    const pdf = new jsPDF({orientation: 'p', unit: 'mm', format: 'a4', compress: true});
     
     const pageW = pdf.internal.pageSize.getWidth();
     const pageH = pdf.internal.pageSize.getHeight();
-    const imgW = pageW;
-    const imgH = (canvas.height * imgW) / canvas.width;
     
-    // FIXED: Added multi-page slicing logic so long quotes don't cut off
-    let heightLeft = imgH;
-    let position = 0;
-    pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH);
-    heightLeft -= pageH;
+    const imgRatio = canvas.width / canvas.height;
+    const pageRatio = pageW / pageH;
     
-    while (heightLeft > 0) {
-      position -= pageH;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, imgW, imgH);
-      heightLeft -= pageH;
+    let finalW, finalH;
+    // Fit to page while maintaining aspect ratio so it's never distorted
+    if (imgRatio > pageRatio) {
+      // Image is wider than page ratio, fit to width
+      finalW = pageW;
+      finalH = pageW / imgRatio;
+    } else {
+      // Image is taller than page ratio, fit to height
+      finalH = pageH;
+      finalW = pageH * imgRatio;
     }
+    
+    // Center beautifully on the page
+    const x = (pageW - finalW) / 2;
+    const y = (pageH - finalH) / 2;
+    
+    pdf.addImage(imgData, 'JPEG', x, y, finalW, finalH, undefined, 'FAST');
     
     return pdf;
   }
