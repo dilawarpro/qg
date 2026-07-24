@@ -311,9 +311,15 @@ textarea#bulkKeywords{font-size:.85rem;}
   .doc-corporate .band{flex-direction:column;align-items:flex-start;gap:.5rem;}
   .doc-corporate .band .meta{text-align:left;}
   
-  /* Reduce padding on Receipt card to give text more room */
-  .doc-receipt{padding:1rem;}
-  .doc-receipt .card{padding:1.2rem 1rem;}
+  /* Fix Receipt Card layout on mobile */
+  .doc-receipt{padding:.5rem;}
+  .doc-receipt .card{padding:1.2rem 1rem; overflow: visible;}
+  .doc-receipt .doc-title{font-size:1.2rem;}
+  .doc-receipt .d-flex.justify-content-between{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .5rem;
+  }
   
   /* General padding reduction for narrow screens */
   .doc-minimal, .doc-bold{padding:1.5rem 1.2rem;}
@@ -496,16 +502,6 @@ textarea#bulkKeywords{font-size:.85rem;}
         </div>
       </div>
 
-      <div class="panel action-btns">
-        <h2><span class="step-num">8</span> Export &amp; Share</h2>
-        <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-primary" id="downloadPdfBtn" type="button"><i class="bi bi-download me-1"></i> Download PDF</button>
-          <button class="btn btn-share" id="sharePdfBtn" type="button"><i class="bi bi-share-fill me-1"></i> Share PDF</button>
-        </div>
-        <div id="pdfStatus" class="mt-2" style="font-size:.8rem;color:var(--slate);"></div>
-        <div class="mt-1" style="font-size:.72rem;color:var(--slate);">Sharing sends the quote as a PDF file only — never as plain text.</div>
-      </div>
-
     </div>
 
     <!-- ============ PREVIEW COLUMN ============ -->
@@ -519,6 +515,18 @@ textarea#bulkKeywords{font-size:.85rem;}
     </div>
 
   </div>
+
+  <!-- ============ EXPORT & SHARE SECTION (MOVED TO BOTTOM) ============ -->
+  <div class="panel action-btns mt-4">
+    <h2><span class="step-num">8</span> Export &amp; Share</h2>
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-primary" id="downloadPdfBtn" type="button"><i class="bi bi-download me-1"></i> Download PDF</button>
+      <button class="btn btn-share" id="sharePdfBtn" type="button"><i class="bi bi-share-fill me-1"></i> Share PDF</button>
+    </div>
+    <div id="pdfStatus" class="mt-2" style="font-size:.8rem;color:var(--slate);"></div>
+    <div class="mt-1" style="font-size:.72rem;color:var(--slate);">Sharing sends the quote as a PDF file only — never as plain text.</div>
+  </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
@@ -1070,23 +1078,21 @@ textarea#bulkKeywords{font-size:.85rem;}
     
     if(!target) throw new Error("Preview not ready");
     
-    // Temporarily remove overflow constraints to capture full height
-    const originalWrapperOverflow = targetWrapper.style.overflow;
-    targetWrapper.style.overflow = 'visible';
-    
-    // FORCE DESKTOP WIDTH: Temporarily set width to 800px to prevent mobile squishing in PDFs
-    const originalWrapperWidth = targetWrapper.style.width;
-    const originalWrapperMaxWidth = targetWrapper.style.maxWidth;
-    targetWrapper.style.width = '800px';
-    targetWrapper.style.maxWidth = '800px';
-    
-    // Wait for fonts to be ready to avoid blank text in canvas
+    // Wait for fonts to be ready
     if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
     
+    // Create a clone for rendering to avoid affecting live layout on mobile
+    const clone = target.cloneNode(true);
+    clone.style.width = '800px'; // Force desktop width
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    document.body.appendChild(clone);
+    
     try {
-      const targetHeight = target.offsetHeight;
+      const targetHeight = clone.offsetHeight;
       const maxCanvasHeight = 5000; 
       let scale = 2;
       if (targetHeight * scale > maxCanvasHeight) {
@@ -1094,12 +1100,14 @@ textarea#bulkKeywords{font-size:.85rem;}
       }
       if (scale < 1) scale = 1;
       
-      const canvas = await html2canvas(target, {
+      const canvas = await html2canvas(clone, {
           scale: scale,
           useCORS: true,
           backgroundColor: '#FFFFFF',
           logging: false
       });
+      
+      document.body.removeChild(clone); // Clean up
       
       const imgData = canvas.toDataURL('image/jpeg', 0.95); 
       
@@ -1113,11 +1121,9 @@ textarea#bulkKeywords{font-size:.85rem;}
       pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST');
       
       return pdf;
-    } finally {
-      // Restore original styles so the live mobile preview goes back to normal
-      targetWrapper.style.overflow = originalWrapperOverflow;
-      targetWrapper.style.width = originalWrapperWidth;
-      targetWrapper.style.maxWidth = originalWrapperMaxWidth;
+    } catch (err) {
+        if(clone.parentNode) document.body.removeChild(clone); // Ensure cleanup on error
+        throw err;
     }
   }
 
