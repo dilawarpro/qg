@@ -1048,19 +1048,16 @@ textarea#bulkKeywords{font-size:.85rem;}
     
     if(!target) throw new Error("Preview not ready");
     
-    // Temporarily remove overflow constraints to capture full height
     const originalWrapperOverflow = targetWrapper.style.overflow;
     targetWrapper.style.overflow = 'visible';
     
-    // Wait for fonts to be ready to avoid blank text in canvas
     if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
     
     try {
-      // Calculate safe scale to avoid canvas size limits (e.g. max 32767px height)
       const targetHeight = target.offsetHeight;
-      const maxCanvasHeight = 5000; // safe limit to avoid memory crashes
+      const maxCanvasHeight = 5000; 
       let scale = 2;
       if (targetHeight * scale > maxCanvasHeight) {
           scale = maxCanvasHeight / targetHeight;
@@ -1078,32 +1075,21 @@ textarea#bulkKeywords{font-size:.85rem;}
       
       const jsPDF = window.jspdf?.jsPDF || window.jspdf;
       if (!jsPDF) throw new Error("jsPDF library not loaded");
-      const pdf = new jsPDF({orientation: 'p', unit: 'mm', format: 'a4', compress: true});
       
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
+      // FIXED: Custom Page Size to eliminate ALL white space
+      // Define target width in mm (Standard A4 width is 210mm)
+      const pageW = 210; 
+      // Calculate exact height based on aspect ratio so there is 0 top/bottom white space
+      const pageH = (canvas.height * pageW) / canvas.width;
       
-      const imgRatio = canvas.width / canvas.height;
-      const pageRatio = pageW / pageH;
+      // Create PDF with exact dimensions matching the canvas aspect ratio
+      const pdf = new jsPDF({orientation: 'p', unit: 'mm', format: [pageW, pageH], compress: true});
       
-      let finalW, finalH;
-      // Fit to page while maintaining aspect ratio so it's never distorted
-      if (imgRatio > pageRatio) {
-        finalW = pageW;
-        finalH = pageW / imgRatio;
-      } else {
-        finalH = pageH;
-        finalW = pageH * imgRatio;
-      }
+      // Add image filling 100% of the page from 0,0
+      pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST');
       
-      // Center beautifully on the page
-      const x = (pageW - finalW) / 2;
-      const y = (pageH - finalH) / 2;
-      
-      pdf.addImage(imgData, 'JPEG', x, y, finalW, finalH, undefined, 'FAST');
       return pdf;
     } finally {
-      // Restore overflow
       targetWrapper.style.overflow = originalWrapperOverflow;
     }
   }
