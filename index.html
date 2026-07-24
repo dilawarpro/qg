@@ -208,8 +208,8 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-minimal .split-line{display:flex;justify-content:space-between;font-size:.76rem;font-family:'JetBrains Mono',monospace;color:#c9c9d1;margin-top:.5rem;}
 
 /* ===== Template: Bold ===== */
-.doc-bold{background:var(--ink);color:#fff;font-family:'Inter',sans-serif;padding:2.2rem 2rem;min-height:100%;position:relative;}
-.doc-bold::before{content:"";position:absolute;top:0;right:0;width:130px;height:130px;background:radial-gradient(circle at top right,var(--green) 0%, transparent 70%);opacity:.35;}
+.doc-bold{background:var(--ink);color:#fff;font-family:'Inter',sans-serif;padding:2.2rem 2rem;min-height:100%;position:relative;overflow:hidden;}
+.doc-bold::before{content:"";position:absolute;top:0;right:0;width:130px;height:130px;background:linear-gradient(135deg, var(--green) 0%, transparent 70%);opacity:.35;}
 .doc-bold .eyebrow{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--green);letter-spacing:.08em;text-transform:uppercase;}
 .doc-bold .doc-title{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:700;margin:.2rem 0 1rem;}
 .doc-bold .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem 1rem;font-size:.78rem;margin-bottom:1rem;}
@@ -400,7 +400,7 @@ textarea#bulkKeywords{font-size:.85rem;}
         </div>
       </div>
 
-      <!-- NEW CUSTOM FIELDS PANEL -->
+      <!-- CUSTOM FIELDS PANEL -->
       <div class="panel">
         <h2><span class="step-num">5</span> Additional Details <small>optional</small></h2>
         <div id="customFieldsContainer"></div>
@@ -509,7 +509,7 @@ textarea#bulkKeywords{font-size:.85rem;}
     keywords: ['best bakery in lahore','custom cake delivery lahore','birthday cakes near me'],
     template: 'minimal',
     discountMode: null,
-    customFields: [], // Array to hold optional custom fields
+    customFields: [],
     quoteRef: 'QT-' + Math.floor(1000 + Math.random()*9000)
   };
 
@@ -1043,44 +1043,69 @@ textarea#bulkKeywords{font-size:.85rem;}
 
   // ---------- PDF generation ----------
   async function generatePdfBlob(){
-    const target = $('quoteDoc').firstElementChild;
-    // Wait a fraction of a second to ensure DOM is fully painted
-    await new Promise(r => setTimeout(r, 50)); 
+    const targetWrapper = $('quoteDoc');
+    const target = targetWrapper.firstElementChild;
     
-    const canvas = await html2canvas(target, {scale:2, useCORS:true, backgroundColor: '#ffffff'});
+    if(!target) throw new Error("Preview not ready");
     
-    // Using JPEG at 100% quality reduces file size significantly compared to PNG while keeping it visually lossless
-    const imgData = canvas.toDataURL('image/jpeg', 1.0); 
+    // Temporarily remove overflow constraints to capture full height
+    const originalWrapperOverflow = targetWrapper.style.overflow;
+    targetWrapper.style.overflow = 'visible';
     
-    const { jsPDF } = window.jspdf;
-    // compress: true compresses the PDF streams for smaller file size
-    const pdf = new jsPDF({orientation: 'p', unit: 'mm', format: 'a4', compress: true});
-    
-    const pageW = pdf.internal.pageSize.getWidth();
-    const pageH = pdf.internal.pageSize.getHeight();
-    
-    const imgRatio = canvas.width / canvas.height;
-    const pageRatio = pageW / pageH;
-    
-    let finalW, finalH;
-    // Fit to page while maintaining aspect ratio so it's never distorted
-    if (imgRatio > pageRatio) {
-      // Image is wider than page ratio, fit to width
-      finalW = pageW;
-      finalH = pageW / imgRatio;
-    } else {
-      // Image is taller than page ratio, fit to height
-      finalH = pageH;
-      finalW = pageH * imgRatio;
+    // Wait for fonts to be ready to avoid blank text in canvas
+    if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
     }
     
-    // Center beautifully on the page
-    const x = (pageW - finalW) / 2;
-    const y = (pageH - finalH) / 2;
-    
-    pdf.addImage(imgData, 'JPEG', x, y, finalW, finalH, undefined, 'FAST');
-    
-    return pdf;
+    try {
+      // Calculate safe scale to avoid canvas size limits (e.g. max 32767px height)
+      const targetHeight = target.offsetHeight;
+      const maxCanvasHeight = 5000; // safe limit to avoid memory crashes
+      let scale = 2;
+      if (targetHeight * scale > maxCanvasHeight) {
+          scale = maxCanvasHeight / targetHeight;
+      }
+      if (scale < 1) scale = 1;
+      
+      const canvas = await html2canvas(target, {
+          scale: scale,
+          useCORS: true,
+          backgroundColor: '#FFFFFF',
+          logging: false
+      });
+      
+      const imgData = canvas.toDataURL('image/jpeg', 0.95); 
+      
+      const jsPDF = window.jspdf?.jsPDF || window.jspdf;
+      if (!jsPDF) throw new Error("jsPDF library not loaded");
+      const pdf = new jsPDF({orientation: 'p', unit: 'mm', format: 'a4', compress: true});
+      
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      
+      const imgRatio = canvas.width / canvas.height;
+      const pageRatio = pageW / pageH;
+      
+      let finalW, finalH;
+      // Fit to page while maintaining aspect ratio so it's never distorted
+      if (imgRatio > pageRatio) {
+        finalW = pageW;
+        finalH = pageW / imgRatio;
+      } else {
+        finalH = pageH;
+        finalW = pageH * imgRatio;
+      }
+      
+      // Center beautifully on the page
+      const x = (pageW - finalW) / 2;
+      const y = (pageH - finalH) / 2;
+      
+      pdf.addImage(imgData, 'JPEG', x, y, finalW, finalH, undefined, 'FAST');
+      return pdf;
+    } finally {
+      // Restore overflow
+      targetWrapper.style.overflow = originalWrapperOverflow;
+    }
   }
 
   $('downloadPdfBtn').addEventListener('click', async function(){
@@ -1094,7 +1119,7 @@ textarea#bulkKeywords{font-size:.85rem;}
       status.textContent = 'PDF downloaded ✓';
     }catch(err){
       status.textContent = 'Could not generate PDF. Try again.';
-      console.error(err);
+      console.error("PDF Generation Error:", err);
     }
     setTimeout(()=>status.textContent='', 3000);
   });
@@ -1125,7 +1150,7 @@ textarea#bulkKeywords{font-size:.85rem;}
         status.textContent = '';
       } else {
         status.textContent = 'Could not share PDF. Try downloading instead.';
-        console.error(err);
+        console.error("Share PDF Error:", err);
       }
     }
     setTimeout(()=>{ if(status.textContent.length < 60) status.textContent=''; }, 4000);
