@@ -180,6 +180,8 @@ textarea#bulkKeywords{font-size:.85rem;}
   background:#fff;
   overflow:hidden;
 }
+/* Prevents long URLs from clipping horizontally */
+#quoteDoc > div { overflow-wrap: break-word; }
 
 /* barcode (shared) */
 .barcode-bars{display:flex;align-items:flex-end;gap:2px;height:34px;justify-content:center;}
@@ -198,7 +200,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-minimal .doc-title{font-family:'Fraunces',serif;font-size:1.6rem;font-weight:600;}
 .doc-minimal .biz-name{font-size:.8rem;color:var(--slate);margin-top:.15rem;}
 .doc-minimal .doc-meta{text-align:right;font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--slate);}
-.doc-minimal .row-line{display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px dashed var(--border);font-size:.84rem;}
+.doc-minimal .row-line{display:flex;justify-content:space-between;padding:.35rem 0;border-bottom:1px dashed var(--border);font-size:.84rem; overflow-wrap: break-word;}
 .doc-minimal .rank-list{list-style:none;padding:0;margin:.4rem 0 0;}
 .doc-minimal .rank-list li{display:flex;align-items:center;gap:.6rem;padding:.3rem 0;font-size:.8rem;font-family:'JetBrains Mono',monospace;}
 .doc-minimal .rank-badge{width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;font-size:.65rem;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
@@ -209,6 +211,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 
 /* ===== Template: Bold ===== */
 .doc-bold{background:var(--ink);color:#fff;font-family:'Inter',sans-serif;padding:2.2rem 2rem;min-height:100%;position:relative;overflow:hidden;}
+.doc-bold::before{content:"";position:absolute;top:0;right:0;width:130px;height:130px;background:linear-gradient(135deg, var(--green) 0%, transparent 70%);opacity:.35;}
 .doc-bold .eyebrow{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--green);letter-spacing:.08em;text-transform:uppercase;}
 .doc-bold .doc-title{font-family:'Fraunces',serif;font-size:1.9rem;font-weight:700;margin:.2rem 0 1rem;}
 .doc-bold .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem 1rem;font-size:.78rem;margin-bottom:1rem;}
@@ -231,7 +234,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-corporate .band .meta{font-family:'JetBrains Mono',monospace;font-size:.7rem;text-align:right;color:#DCDBFB;}
 .doc-corporate .body-pad{padding:1.4rem 2rem;flex:1;}
 .doc-corporate table{width:100%;font-size:.8rem;border-collapse:collapse;}
-.doc-corporate table td{padding:.4rem 0;border-bottom:1px solid var(--border);}
+.doc-corporate table td{padding:.4rem 0;border-bottom:1px solid var(--border); overflow-wrap: break-word;}
 .doc-corporate table td:first-child{color:var(--slate);font-family:'JetBrains Mono',monospace;font-size:.7rem;text-transform:uppercase;width:38%;}
 .doc-corporate .rank-list{list-style:none;padding:0;margin:.3rem 0 0;}
 .doc-corporate .rank-list li{display:flex;align-items:center;gap:.6rem;padding:.28rem 0;font-size:.8rem;font-family:'JetBrains Mono',monospace;}
@@ -247,7 +250,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-receipt .doc-title{font-family:'Fraunces',serif;font-size:1.5rem;font-weight:700;line-height:1.15;margin:.2rem 0 .3rem;}
 .doc-receipt .biz-sub{font-size:.78rem;color:var(--slate);}
 .doc-receipt .ref-box{background:var(--indigo-light);color:var(--indigo);border-radius:8px;padding:.5rem .7rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;text-align:center;}
-.doc-receipt .row-line{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.84rem;}
+.doc-receipt .row-line{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.84rem; overflow-wrap: break-word;}
 .doc-receipt .badge-status{background:var(--amber-light);color:#92620A;border-radius:999px;padding:.2rem .7rem;font-size:.72rem;font-weight:700;}
 .doc-receipt .section-title{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:.9rem 0 .3rem;color:var(--slate);}
 .doc-receipt .rank-list{list-style:none;padding:0;margin:.3rem 0 0;}
@@ -260,16 +263,16 @@ textarea#bulkKeywords{font-size:.85rem;}
 
 /* ===== Template: Teal Band ===== */
 .doc-tealband{background:#fff;font-family:'Inter',sans-serif;min-height:100%;display:flex;flex-direction:column;overflow:hidden;}
-.doc-tealband .band{background:var(--teal);color:#fff;padding:1.5rem 1.7rem;}
+.doc-tealband .band{background:var(--teal);color:#fff;padding:1.5rem 1.7rem;display:flex;justify-content:space-between;align-items:flex-start;}
 .doc-tealband .band .doc-title{font-family:'Fraunces',serif;font-size:1.35rem;font-weight:700;}
 .doc-tealband .band .eyebrow{font-size:.72rem;opacity:.85;margin-top:.15rem;}
 .doc-tealband .band .meta{font-family:'JetBrains Mono',monospace;font-size:.7rem;text-align:right;opacity:.9;}
 .doc-tealband .body-pad{padding:1.4rem 1.7rem;flex:1;}
-.doc-tealband .row-line{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.84rem;}
+.doc-tealband .row-line{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--border);font-size:.84rem; overflow-wrap: break-word;}
 .doc-tealband .badge-status{background:var(--teal-light);color:var(--teal);border-radius:999px;padding:.2rem .7rem;font-size:.72rem;font-weight:700;}
 .doc-tealband .section-title{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:.9rem 0 .3rem;color:var(--slate);}
 .doc-tealband .rank-list{list-style:none;padding:0;margin:.3rem 0 0;}
-.doc-tealband .rank-list li{display:flex;align-items:center;gap:.6rem;padding:.28rem 0;font-size:.8rem;font-family:'JetBrains Mono',monospace;}
+.doc-tealband .rank-list li{display:flex;align-items:center;gap:.6rem;padding:.28rem 0;font-size:.8rem;font-family:'JetBrains Mono',monospace; overflow-wrap: break-word;}
 .doc-tealband .rank-badge{width:20px;height:20px;border-radius:50%;background:var(--teal);color:#fff;font-size:.65rem;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
 .doc-tealband .amount-box{background:#F3F4F6;border-radius:10px;padding:1rem;text-align:center;margin-top:1rem;}
 .doc-tealband .amount-box .lbl2{font-size:.78rem;color:var(--slate);}
@@ -284,7 +287,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-typewriter .biz-name{text-align:center;font-size:1.15rem;font-weight:700;letter-spacing:.03em;}
 .doc-typewriter .biz-sub{text-align:center;font-size:.72rem;color:var(--slate);margin-top:.2rem;}
 .doc-typewriter hr{border-top:1px dashed var(--border);margin:.9rem 0;}
-.doc-typewriter .row-line{display:flex;justify-content:space-between;padding:.25rem 0;font-size:.78rem;text-transform:uppercase;}
+.doc-typewriter .row-line{display:flex;justify-content:space-between;padding:.25rem 0;font-size:.78rem;text-transform:uppercase; overflow-wrap: break-word;}
 .doc-typewriter .ref-box{border:1px dashed var(--ink);border-radius:8px;text-align:center;padding:.5rem;font-weight:700;letter-spacing:.08em;margin:.8rem 0;font-size:.85rem;}
 .doc-typewriter .section-title{font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:.8rem 0 .3rem;color:var(--slate);}
 .doc-typewriter .rank-list{list-style:none;padding:0;margin:.3rem 0 0;}
@@ -296,14 +299,41 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-typewriter .thankyou{text-align:center;font-weight:700;margin-top:1rem;font-size:.85rem;letter-spacing:.03em;}
 .doc-typewriter .footer-note{text-align:center;font-size:.7rem;color:var(--slate);margin-top:.4rem;}
 
-@media(max-width:991px){.preview-wrap{position:static;margin-top:1.5rem;} .tpl-card{width:calc(50% - .4rem);}}
+/* ---------- Mobile Responsiveness for Live Preview ---------- */
+@media(max-width:991px){
+  .preview-wrap{position:static;margin-top:1.5rem;} 
+  .tpl-card{width:calc(50% - .4rem);}
+}
+@media(max-width:576px){
+  /* Fix Teal Band layout on mobile */
+  .doc-tealband .band{flex-direction:column;gap:.5rem;}
+  .doc-tealband .band .meta{text-align:left;}
+  
+  /* Fix Corporate layout on mobile */
+  .doc-corporate .band{flex-direction:column;align-items:flex-start;gap:.5rem;}
+  .doc-corporate .band .meta{text-align:left;}
+  
+  /* Fix Receipt Card layout on mobile */
+  .doc-receipt{padding:.5rem;}
+  .doc-receipt .card{padding:1.2rem 1rem;}
+  .doc-receipt .doc-title{font-size:1.2rem;}
+  .doc-receipt .d-flex.justify-content-between{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .5rem;
+  }
+  
+  /* General padding reduction for narrow screens */
+  .doc-minimal, .doc-bold{padding:1.5rem 1.2rem;}
+  .doc-corporate .body-pad, .doc-tealband .body-pad{padding:1.2rem;}
+}
 </style>
 </head>
 <body>
 
 <div class="app-header d-flex justify-content-between align-items-center">
   <div>
-    <div class="brand">Quote<span class="rank">Rank</span> Generator</div>
+    <div class="brand">Quote Generator</div>
     <div class="sub">web &amp; seo service quotes — built for closing deals</div>
   </div>
   <div class="d-none d-md-block sub">step through the form → preview updates live</div>
@@ -337,10 +367,10 @@ textarea#bulkKeywords{font-size:.85rem;}
           <div class="col-md-6">
             <label class="form-label">Service Type</label>
             <select id="serviceType" class="form-select">
-              <option>Complete Website Setup + SEO</option>
-              <option>Website Setup Only</option>
+              <option>Website Design + SEO</option>
+              <option>Website Design Only</option>
               <option>SEO Only</option>
-              <option>Website Resetup</option>
+              <option>Website Redesign</option>
               <option>E-commerce Website</option>
               <option>Custom Web Application</option>
             </select>
@@ -412,9 +442,17 @@ textarea#bulkKeywords{font-size:.85rem;}
         <h2><span class="step-num">6</span> Pricing, Discount &amp; Payment</h2>
         <div class="row g-3">
           <div class="col-md-6">
+            <label class="form-label">Currency</label>
+            <select id="currencyType" class="form-select">
+              <option value="PKR">PKR (Rs.)</option>
+              <option value="AED">AED (د.إ)</option>
+              <option value="USD">USD ($)</option>
+            </select>
+          </div>
+          <div class="col-md-6">
             <label class="form-label">Total Project Price</label>
             <div class="input-group">
-              <span class="input-group-text">Rs.</span>
+              <span class="input-group-text cur-sym">Rs.</span>
               <input type="number" id="totalPrice" class="form-control" value="85000" min="0" step="500">
             </div>
           </div>
@@ -431,7 +469,7 @@ textarea#bulkKeywords{font-size:.85rem;}
               </div>
               <div class="col-6">
                 <div class="input-group input-group-sm">
-                  <span class="input-group-text">Rs.</span>
+                  <span class="input-group-text cur-sym">Rs.</span>
                   <input type="number" id="discountAmount" class="form-control" placeholder="amount" min="0">
                 </div>
               </div>
@@ -473,16 +511,6 @@ textarea#bulkKeywords{font-size:.85rem;}
         </div>
       </div>
 
-      <div class="panel action-btns">
-        <h2><span class="step-num">8</span> Export &amp; Share</h2>
-        <div class="d-flex flex-wrap gap-2">
-          <button class="btn btn-primary" id="downloadPdfBtn" type="button"><i class="bi bi-download me-1"></i> Download PDF</button>
-          <button class="btn btn-share" id="sharePdfBtn" type="button"><i class="bi bi-share-fill me-1"></i> Share PDF</button>
-        </div>
-        <div id="pdfStatus" class="mt-2" style="font-size:.8rem;color:var(--slate);"></div>
-        <div class="mt-1" style="font-size:.72rem;color:var(--slate);">Sharing sends the quote as a PDF file only — never as plain text.</div>
-      </div>
-
     </div>
 
     <!-- ============ PREVIEW COLUMN ============ -->
@@ -496,6 +524,18 @@ textarea#bulkKeywords{font-size:.85rem;}
     </div>
 
   </div>
+
+  <!-- ============ EXPORT & SHARE SECTION (MOVED TO BOTTOM) ============ -->
+  <div class="panel action-btns mt-4">
+    <h2><span class="step-num">8</span> Export &amp; Share</h2>
+    <div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-primary" id="downloadPdfBtn" type="button"><i class="bi bi-download me-1"></i> Download PDF</button>
+      <button class="btn btn-share" id="sharePdfBtn" type="button"><i class="bi bi-share-fill me-1"></i> Share PDF</button>
+    </div>
+    <div id="pdfStatus" class="mt-2" style="font-size:.8rem;color:var(--slate);"></div>
+    <div class="mt-1" style="font-size:.72rem;color:var(--slate);">Sharing sends the quote as a PDF file only — never as plain text.</div>
+  </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
@@ -507,6 +547,7 @@ textarea#bulkKeywords{font-size:.85rem;}
     sections: ['Home','About','Services','Contact'],
     keywords: ['best bakery in lahore','custom cake delivery lahore','birthday cakes near me'],
     template: 'minimal',
+    currency: 'PKR',
     discountMode: null,
     customFields: [],
     quoteRef: 'QT-' + Math.floor(1000 + Math.random()*9000)
@@ -525,10 +566,32 @@ textarea#bulkKeywords{font-size:.85rem;}
     const d = new Date(str+'T00:00:00');
     return d.toLocaleDateString('en-US',{day:'numeric',month:'short',year:'numeric'});
   }
+  
+  // ---------- Multi-Currency Formatting ----------
+  function getCurrencySymbol() {
+    if(state.currency === 'USD') return '$';
+    if(state.currency === 'AED') return 'AED';
+    return 'Rs.';
+  }
+
   function fmtMoney(n){
     n = Math.round(Number(n)||0);
+    if(state.currency === 'USD') return n.toLocaleString('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    if(state.currency === 'AED') return n.toLocaleString('en-US', { style: 'currency', currency: 'AED', minimumFractionDigits: 0, maximumFractionDigits: 0 });
     return 'Rs. ' + n.toLocaleString('en-IN');
   }
+
+  // Update currency symbols in the form UI
+  function updateCurrencyUI(){
+    const sym = getCurrencySymbol();
+    document.querySelectorAll('.cur-sym').forEach(el => el.textContent = sym);
+  }
+
+  $('currencyType').addEventListener('change', function(){
+    state.currency = this.value;
+    updateCurrencyUI();
+    updatePricing();
+  });
 
   // ---------- Sections ----------
   $('sectionChips').addEventListener('click', function(e){
@@ -1047,15 +1110,42 @@ textarea#bulkKeywords{font-size:.85rem;}
     
     if(!target) throw new Error("Preview not ready");
     
-    const originalWrapperOverflow = targetWrapper.style.overflow;
-    targetWrapper.style.overflow = 'visible';
-    
+    // Wait for fonts to be ready
     if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
-    
+
+    // Create a clone for rendering to avoid affecting live layout on mobile
+    const clone = target.cloneNode(true);
+    clone.style.width = '800px'; // Force desktop width
+    clone.style.position = 'absolute';
+    clone.style.left = '-9999px';
+    clone.style.top = '0';
+    clone.style.minHeight = 'auto';
+    clone.classList.add('pdf-clone'); // Add class to force desktop layout
+
+    const style = document.createElement('style');
+    style.textContent = `
+      .pdf-clone.doc-tealband .band,
+      .pdf-clone.doc-corporate .band,
+      .pdf-clone.doc-receipt .d-flex.justify-content-between {
+        flex-direction: row !important;
+        align-items: flex-start !important;
+      }
+      .pdf-clone.doc-corporate .band { align-items: center !important; }
+      .pdf-clone.doc-tealband .band .meta,
+      .pdf-clone.doc-corporate .band .meta { text-align: right !important; }
+      .pdf-clone.doc-receipt { padding: 1.6rem !important; }
+      .pdf-clone.doc-receipt .card { padding: 1.7rem 1.6rem !important; }
+      .pdf-clone.doc-receipt .doc-title { font-size: 1.5rem !important; }
+      .pdf-clone.doc-minimal, .pdf-clone.doc-bold { padding: 2.2rem 2rem !important; }
+      .pdf-clone.doc-corporate .body-pad, .pdf-clone.doc-tealband .body-pad { padding: 1.4rem 1.7rem !important; }
+    `;
+    clone.appendChild(style);
+    document.body.appendChild(clone);
+
     try {
-      const targetHeight = target.offsetHeight;
+      const targetHeight = clone.offsetHeight;
       const maxCanvasHeight = 5000; 
       let scale = 2;
       if (targetHeight * scale > maxCanvasHeight) {
@@ -1063,33 +1153,30 @@ textarea#bulkKeywords{font-size:.85rem;}
       }
       if (scale < 1) scale = 1;
       
-      const canvas = await html2canvas(target, {
+      const canvas = await html2canvas(clone, {
           scale: scale,
           useCORS: true,
           backgroundColor: '#FFFFFF',
           logging: false
       });
       
+      if(clone.parentNode) document.body.removeChild(clone); // Clean up
+      
       const imgData = canvas.toDataURL('image/jpeg', 0.95); 
       
       const jsPDF = window.jspdf?.jsPDF || window.jspdf;
       if (!jsPDF) throw new Error("jsPDF library not loaded");
       
-      // FIXED: Custom Page Size to eliminate ALL white space
-      // Define target width in mm (Standard A4 width is 210mm)
+      // Custom Page Size to eliminate ALL white space
       const pageW = 210; 
-      // Calculate exact height based on aspect ratio so there is 0 top/bottom white space
       const pageH = (canvas.height * pageW) / canvas.width;
-      
-      // Create PDF with exact dimensions matching the canvas aspect ratio
       const pdf = new jsPDF({orientation: 'p', unit: 'mm', format: [pageW, pageH], compress: true});
-      
-      // Add image filling 100% of the page from 0,0
       pdf.addImage(imgData, 'JPEG', 0, 0, pageW, pageH, undefined, 'FAST');
       
       return pdf;
-    } finally {
-      targetWrapper.style.overflow = originalWrapperOverflow;
+    } catch (err) {
+        if(clone.parentNode) document.body.removeChild(clone); // Ensure cleanup on error
+        throw err;
     }
   }
 
@@ -1144,6 +1231,7 @@ textarea#bulkKeywords{font-size:.85rem;}
   // ---------- Init ----------
   renderKeywordTags();
   renderCustomFieldsUI();
+  updateCurrencyUI();
   updatePricing();
   renderPreview();
 })();
