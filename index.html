@@ -127,6 +127,13 @@ label.form-label{
 }
 textarea#bulkKeywords{font-size:.85rem;}
 
+.bd-row{padding:.5rem 0;border-bottom:1px dashed var(--border);}
+.bd-row:last-child{border-bottom:none;}
+.bd-row .bd-item-label{font-size:.85rem;font-weight:600;}
+.bd-row .bd-sub-select{font-size:.76rem;padding:.2rem .5rem;margin-top:.35rem;}
+.bd-row .form-check-label{font-size:.72rem;}
+.extra-item-row{margin-bottom:.5rem;}
+
 .payment-split{
   display:flex;border-radius:10px;overflow:hidden;height:38px;
   border:1px solid var(--border);margin-top:.5rem;
@@ -194,6 +201,14 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-bold .included-grid .item i{color:var(--green);}
 .doc-tealband .included-grid .item i,.doc-typewriter .included-grid .item i{color:var(--teal);}
 
+/* Pricing breakdown table (shared across templates) */
+.breakdown-table{width:100%;font-size:.8rem;border-collapse:collapse;margin-top:.3rem;}
+.breakdown-table td{padding:.35rem 0;border-bottom:1px dashed var(--border); overflow-wrap:break-word;}
+.breakdown-table td.bd-label{color:var(--ink);}
+.breakdown-table td.bd-note{display:block;font-size:.68rem;color:var(--slate);font-weight:400;}
+.breakdown-table td.bd-amt{text-align:right;font-family:'JetBrains Mono',monospace;white-space:nowrap;}
+.breakdown-table tr:last-child td{border-bottom:none;}
+
 /* ===== Template: Minimal ===== */
 .doc-minimal{background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;padding:2.2rem 2rem;min-height:100%;}
 .doc-minimal .doc-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid var(--ink);padding-bottom:1rem;margin-bottom:1.2rem;}
@@ -208,6 +223,8 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-minimal .price-box .price-summary .r{border-bottom-color:#3a3a42;color:#dcdce2;}
 .doc-minimal .price-box .total{font-family:'Fraunces',serif;font-size:1.7rem;font-weight:600;color:#fff;}
 .doc-minimal .split-line{display:flex;justify-content:space-between;font-size:.76rem;font-family:'JetBrains Mono',monospace;color:#c9c9d1;margin-top:.5rem;}
+.doc-minimal .breakdown-table td{border-bottom-color:#3a3a42;}
+.doc-minimal .breakdown-table.on-paper td{border-bottom-color:var(--border);}
 
 /* ===== Template: Bold ===== */
 .doc-bold{background:var(--ink);color:#fff;font-family:'Inter',sans-serif;padding:2.2rem 2rem;min-height:100%;position:relative;overflow:hidden;}
@@ -225,6 +242,8 @@ textarea#bulkKeywords{font-size:.85rem;}
 .doc-bold .split-line{display:flex;justify-content:space-between;font-size:.76rem;font-family:'JetBrains Mono',monospace;color:#a6a6ae;margin-top:.5rem;}
 .doc-bold .barcode-bars span{background:#fff;}
 .doc-bold .barcode-text{color:#8f8f9a;}
+.doc-bold .breakdown-table td{border-bottom-color:#2b2b33;color:#dcdce2;}
+.doc-bold .breakdown-table td.bd-note{color:#8f8f9a;}
 
 /* ===== Template: Corporate ===== */
 .doc-corporate{background:#fff;color:var(--ink);font-family:'Inter',sans-serif;min-height:100%;display:flex;flex-direction:column;}
@@ -428,9 +447,23 @@ textarea#bulkKeywords{font-size:.85rem;}
         </div>
       </div>
 
+      <!-- PRICING BREAKDOWN PANEL -->
+      <div class="panel">
+        <h2><span class="step-num">5</span> Pricing Breakdown <small>itemized cost per service</small></h2>
+        <div id="breakdownItemsContainer"></div>
+        <div class="mt-3 pt-3" style="border-top:1px dashed var(--border);">
+          <label class="form-label">Extra Line Items <small style="text-transform:none;font-weight:400;">(optional — rush fee, extra pages, etc.)</small></label>
+          <div id="extraItemsContainer"></div>
+          <button type="button" class="btn btn-sm btn-outline-secondary mt-1" id="addExtraItemBtn"><i class="bi bi-plus-lg me-1"></i> Add Line Item</button>
+        </div>
+        <div class="price-summary mt-3 pt-2" style="border-top:1px solid var(--border);">
+          <div class="r total"><span>Breakdown Subtotal</span><span id="breakdownSubtotalDisplay" class="mono">Rs. 0</span></div>
+        </div>
+      </div>
+
       <!-- CUSTOM FIELDS PANEL -->
       <div class="panel">
-        <h2><span class="step-num">5</span> Additional Details <small>optional</small></h2>
+        <h2><span class="step-num">6</span> Additional Details <small>optional</small></h2>
         <div id="customFieldsContainer"></div>
         <div class="mt-2">
           <button type="button" class="btn btn-sm btn-outline-secondary" id="addCustomFieldBtn"><i class="bi bi-plus-lg me-1"></i> Add Custom Field</button>
@@ -438,7 +471,7 @@ textarea#bulkKeywords{font-size:.85rem;}
       </div>
 
       <div class="panel">
-        <h2><span class="step-num">6</span> Pricing, Discount &amp; Payment</h2>
+        <h2><span class="step-num">7</span> Pricing, Discount &amp; Payment</h2>
         <div class="row g-3">
           <div class="col-md-6">
             <label class="form-label">Currency</label>
@@ -449,10 +482,10 @@ textarea#bulkKeywords{font-size:.85rem;}
             </select>
           </div>
           <div class="col-md-6">
-            <label class="form-label">Total Project Price</label>
+            <label class="form-label">Total Project Price <small style="text-transform:none;font-weight:400;">(from breakdown above)</small></label>
             <div class="input-group">
               <span class="input-group-text cur-sym">Rs.</span>
-              <input type="number" id="totalPrice" class="form-control" value="85000" min="0" step="500">
+              <input type="text" id="totalPriceDisplay" class="form-control" value="0" disabled style="background:#F5F5F4;font-weight:600;">
             </div>
           </div>
           <div class="col-md-6">
@@ -499,7 +532,7 @@ textarea#bulkKeywords{font-size:.85rem;}
       </div>
 
       <div class="panel">
-        <h2><span class="step-num">7</span> Choose a Template</h2>
+        <h2><span class="step-num">8</span> Choose a Template</h2>
         <div class="tpl-picker">
           <div class="tpl-card tpl-minimal active" data-tpl="minimal"><div class="swatch"></div><span>Minimal</span></div>
           <div class="tpl-card tpl-bold" data-tpl="bold"><div class="swatch"></div><span>Bold Dark</span></div>
@@ -526,7 +559,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 
   <!-- ============ EXPORT & SHARE SECTION (MOVED TO BOTTOM) ============ -->
   <div class="panel action-btns mt-4">
-    <h2><span class="step-num">8</span> Export &amp; Share</h2>
+    <h2><span class="step-num">9</span> Export &amp; Share</h2>
     <div class="d-flex flex-wrap gap-2">
       <button class="btn btn-primary" id="downloadPdfBtn" type="button"><i class="bi bi-download me-1"></i> Download PDF</button>
       <button class="btn btn-share" id="sharePdfBtn" type="button"><i class="bi bi-share-fill me-1"></i> Share PDF</button>
@@ -549,7 +582,19 @@ textarea#bulkKeywords{font-size:.85rem;}
     currency: 'PKR',
     discountMode: null,
     customFields: [],
-    quoteRef: 'QT-' + Math.floor(1000 + Math.random()*9000)
+    quoteRef: 'QT-' + Math.floor(1000 + Math.random()*9000),
+    itemPrices: {
+      Design: 15000,
+      Development: 25000,
+      SEO: 20000,
+      Domain: 5800,
+      Maintenance: 8000,
+      Support: 5000
+    },
+    hostingMode: 'yearly',
+    hostingPrices: { yearly: 16000, lifetime: 20000 },
+    domainTaxIncluded: true,
+    extraItems: []
   };
 
   const $ = (id) => document.getElementById(id);
@@ -627,12 +672,189 @@ textarea#bulkKeywords{font-size:.85rem;}
     const cb = chip.querySelector('input');
     setTimeout(()=>{
       chip.classList.toggle('active', cb.checked);
-      renderPreview();
+      renderBreakdownUI();
+      updatePricing();
     },0);
   });
   function getPackage(){
     return Array.from($('pkgChips').querySelectorAll('input:checked')).map(i=>i.value);
   }
+
+  // ---------- Pricing Breakdown ----------
+  const PKG_ORDER = ['Design','Development','SEO','Domain','Hosting','Maintenance','Support'];
+
+  function getBreakdownItems(){
+    const pkg = getPackage();
+    const items = [];
+    PKG_ORDER.forEach(key=>{
+      if(!pkg.includes(key)) return;
+      if(key === 'Hosting'){
+        const price = Number(state.hostingPrices[state.hostingMode]) || 0;
+        items.push({
+          label: 'Hosting',
+          note: state.hostingMode === 'yearly' ? 'billed per year' : 'one-time · lifetime',
+          amount: price
+        });
+      } else if(key === 'Domain'){
+        items.push({
+          label: 'Domain',
+          note: state.domainTaxIncluded ? 'incl. taxes' : '+ taxes extra',
+          amount: Number(state.itemPrices.Domain) || 0
+        });
+      } else {
+        items.push({ label: key, note: '', amount: Number(state.itemPrices[key]) || 0 });
+      }
+    });
+    state.extraItems.forEach(it=>{
+      if(it.label && it.label.trim() !== ''){
+        items.push({ label: it.label, note: '', amount: Number(it.price) || 0 });
+      }
+    });
+    return items;
+  }
+
+  function getBreakdownSubtotal(){
+    return getBreakdownItems().reduce((sum, it)=> sum + (Number(it.amount)||0), 0);
+  }
+
+  function renderBreakdownUI(){
+    const pkg = getPackage();
+    const container = $('breakdownItemsContainer');
+    container.innerHTML = '';
+
+    if(!pkg.length){
+      container.innerHTML = '<div style="font-size:.78rem;color:var(--slate);">Select package inclusions above to price them here.</div>';
+    }
+
+    PKG_ORDER.forEach(key=>{
+      if(!pkg.includes(key)) return;
+      const row = document.createElement('div');
+      row.className = 'bd-row row g-2 align-items-start';
+
+      if(key === 'Hosting'){
+        row.innerHTML = `
+          <div class="col-5">
+            <div class="bd-item-label">Hosting</div>
+            <select id="hostingModeSelect" class="form-select form-select-sm bd-sub-select">
+              <option value="yearly">Per Year</option>
+              <option value="lifetime">Lifetime</option>
+            </select>
+          </div>
+          <div class="col-7">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text cur-sym">Rs.</span>
+              <input type="number" id="hostingPriceInput" class="form-control" min="0" step="500">
+            </div>
+          </div>`;
+        container.appendChild(row);
+        $('hostingModeSelect').value = state.hostingMode;
+        $('hostingPriceInput').value = state.hostingPrices[state.hostingMode];
+        $('hostingModeSelect').addEventListener('change', function(){
+          state.hostingMode = this.value;
+          $('hostingPriceInput').value = state.hostingPrices[state.hostingMode];
+          updatePricing();
+        });
+        $('hostingPriceInput').addEventListener('input', function(){
+          state.hostingPrices[state.hostingMode] = Number(this.value) || 0;
+          updatePricing();
+        });
+      } else if(key === 'Domain'){
+        row.innerHTML = `
+          <div class="col-5">
+            <div class="bd-item-label">Domain</div>
+            <div class="form-check mt-1">
+              <input class="form-check-input" type="checkbox" id="domainTaxCheck">
+              <label class="form-check-label" for="domainTaxCheck" style="text-transform:none;color:var(--slate);">incl. taxes</label>
+            </div>
+          </div>
+          <div class="col-7">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text cur-sym">Rs.</span>
+              <input type="number" id="domainPriceInput" class="form-control" min="0" step="100">
+            </div>
+          </div>`;
+        container.appendChild(row);
+        $('domainTaxCheck').checked = state.domainTaxIncluded;
+        $('domainPriceInput').value = state.itemPrices.Domain;
+        $('domainTaxCheck').addEventListener('change', function(){
+          state.domainTaxIncluded = this.checked;
+          updatePricing();
+        });
+        $('domainPriceInput').addEventListener('input', function(){
+          state.itemPrices.Domain = Number(this.value) || 0;
+          updatePricing();
+        });
+      } else {
+        row.innerHTML = `
+          <div class="col-5"><div class="bd-item-label">${key}</div></div>
+          <div class="col-7">
+            <div class="input-group input-group-sm">
+              <span class="input-group-text cur-sym">Rs.</span>
+              <input type="number" class="form-control bd-price-input" data-key="${key}" min="0" step="500">
+            </div>
+          </div>`;
+        container.appendChild(row);
+        const input = row.querySelector('.bd-price-input');
+        input.value = state.itemPrices[key];
+        input.addEventListener('input', function(){
+          state.itemPrices[key] = Number(this.value) || 0;
+          updatePricing();
+        });
+      }
+    });
+
+    updateCurrencyUI();
+    renderExtraItemsUI();
+  }
+
+  function renderExtraItemsUI(){
+    const container = $('extraItemsContainer');
+    container.innerHTML = '';
+    state.extraItems.forEach((item, idx)=>{
+      const row = document.createElement('div');
+      row.className = 'row g-2 extra-item-row align-items-center';
+      row.innerHTML = `
+        <div class="col-5">
+          <input type="text" class="form-control form-control-sm extra-item-label" value="${(item.label||'').replace(/"/g,'&quot;')}" data-idx="${idx}" placeholder="Item name">
+        </div>
+        <div class="col-6">
+          <div class="input-group input-group-sm">
+            <span class="input-group-text cur-sym">Rs.</span>
+            <input type="number" class="form-control extra-item-price" value="${item.price}" data-idx="${idx}" min="0" step="500">
+          </div>
+        </div>
+        <div class="col-1 d-flex justify-content-center">
+          <button type="button" class="btn btn-sm btn-outline-danger extra-item-remove" data-idx="${idx}"><i class="bi bi-trash"></i></button>
+        </div>`;
+      container.appendChild(row);
+    });
+    container.querySelectorAll('.extra-item-label').forEach(input=>{
+      input.addEventListener('input', function(){
+        state.extraItems[Number(this.dataset.idx)].label = this.value;
+        updatePricing();
+      });
+    });
+    container.querySelectorAll('.extra-item-price').forEach(input=>{
+      input.addEventListener('input', function(){
+        state.extraItems[Number(this.dataset.idx)].price = Number(this.value) || 0;
+        updatePricing();
+      });
+    });
+    container.querySelectorAll('.extra-item-remove').forEach(btn=>{
+      btn.addEventListener('click', function(){
+        state.extraItems.splice(Number(this.dataset.idx), 1);
+        renderExtraItemsUI();
+        updatePricing();
+      });
+    });
+    updateCurrencyUI();
+  }
+
+  $('addExtraItemBtn').addEventListener('click', function(){
+    state.extraItems.push({ label: '', price: 0 });
+    renderExtraItemsUI();
+    updatePricing();
+  });
 
   // ---------- Custom Fields ----------
   $('addCustomFieldBtn').addEventListener('click', function(){
@@ -772,10 +994,12 @@ textarea#bulkKeywords{font-size:.85rem;}
 
   // ---------- Pricing ----------
   function updatePricing(){
-    const total = Number($('totalPrice').value)||0;
+    const total = getBreakdownSubtotal();
     const discount = computeDiscount(total);
     const payable = Math.max(total - discount, 0);
 
+    $('breakdownSubtotalDisplay').textContent = fmtMoney(total);
+    $('totalPriceDisplay').value = fmtMoney(total);
     $('sumSubtotal').textContent = fmtMoney(total);
     if(discount > 0){
       $('sumDiscountRow').style.display = 'flex';
@@ -798,7 +1022,7 @@ textarea#bulkKeywords{font-size:.85rem;}
     $('remSplitBox').textContent = remPct>12 ? fmtMoney(remAmt) : '';
     renderPreview();
   }
-  ['totalPrice','advancePercent'].forEach(id=>$(id).addEventListener('input', updatePricing));
+  ['advancePercent'].forEach(id=>$(id).addEventListener('input', updatePricing));
 
   // ---------- Template picker ----------
   document.querySelectorAll('.tpl-card').forEach(card=>{
@@ -830,7 +1054,7 @@ textarea#bulkKeywords{font-size:.85rem;}
 
   // ---------- Data ----------
   function getData(){
-    const total = Number($('totalPrice').value)||0;
+    const total = getBreakdownSubtotal();
     const discount = computeDiscount(total);
     const payable = Math.max(total - discount, 0);
     const advPct = Number($('advancePercent').value);
@@ -848,6 +1072,7 @@ textarea#bulkKeywords{font-size:.85rem;}
       keywords: state.keywords,
       customFields: state.customFields.filter(f => f.label.trim() !== ''),
       pkg: getPackage(),
+      breakdownItems: getBreakdownItems(),
       total, discount, payable,
       discountPct: total>0 ? Math.round((discount/total*100)*10)/10 : 0,
       advPct, remPct: 100-advPct, advAmt, remAmt,
@@ -867,6 +1092,13 @@ textarea#bulkKeywords{font-size:.85rem;}
     return '<div class="included-grid">'+pkg.map(p=>
       '<div class="item"><i class="bi bi-check-circle-fill"></i> '+p+'</div>'
     ).join('')+'</div>';
+  }
+
+  function breakdownTableHTML(items){
+    if(!items || !items.length) return '<div style="font-size:.76rem;color:var(--slate);">No priced items selected</div>';
+    return '<table class="breakdown-table">' + items.map(it=>
+      '<tr><td class="bd-label">'+it.label+(it.note ? '<span class="bd-note">'+it.note+'</span>' : '')+'</td><td class="bd-amt">'+fmtMoney(it.amount)+'</td></tr>'
+    ).join('') + '</table>';
   }
 
   function priceSummary(d){
@@ -937,6 +1169,8 @@ textarea#bulkKeywords{font-size:.85rem;}
         ${includedGrid(d.pkg)}
         <div class="section-title" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:.9rem 0 .3rem;color:var(--slate);">Target Ranking Keywords</div>
         ${rankList(d.keywords)}
+        <div class="section-title" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:.9rem 0 .3rem;color:var(--slate);">Pricing Breakdown</div>
+        ${breakdownTableHTML(d.breakdownItems)}
         <div class="price-box">
           ${priceSummary(d)}
           <div style="font-size:.7rem;color:#9d9da5;font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-top:.5rem;">Total Payable</div>
@@ -964,6 +1198,8 @@ textarea#bulkKeywords{font-size:.85rem;}
         ${includedGrid(d.pkg)}
         <div class="eyebrow" style="margin-top:.8rem;">Ranking Targets</div>
         ${rankList(d.keywords)}
+        <div class="eyebrow" style="margin-top:.8rem;">Pricing Breakdown</div>
+        ${breakdownTableHTML(d.breakdownItems)}
         <div class="price-hero">
           ${priceSummary(d)}
           <div class="eyebrow" style="margin-top:.5rem;">Total Payable</div>
@@ -995,6 +1231,8 @@ textarea#bulkKeywords{font-size:.85rem;}
           ${includedGrid(d.pkg)}
           <div class="section-title" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:.9rem 0 .3rem;color:var(--slate);">Target Ranking Keywords</div>
           ${rankList(d.keywords)}
+          <div class="section-title" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin:.9rem 0 .3rem;color:var(--slate);">Pricing Breakdown</div>
+          ${breakdownTableHTML(d.breakdownItems)}
           <div class="price-box">
             ${priceSummary(d)}
             <div style="font-size:.68rem;color:var(--slate);font-family:'JetBrains Mono',monospace;text-transform:uppercase;margin-top:.5rem;">Total Payable</div>
@@ -1025,6 +1263,8 @@ textarea#bulkKeywords{font-size:.85rem;}
         ${includedGrid(d.pkg)}
         <div class="section-title">Target Ranking Keywords</div>
         ${rankList(d.keywords)}
+        <div class="section-title">Pricing Breakdown</div>
+        ${breakdownTableHTML(d.breakdownItems)}
         <div class="price-summary">
           ${priceSummary(d)}
         </div>
@@ -1055,6 +1295,8 @@ textarea#bulkKeywords{font-size:.85rem;}
           ${includedGrid(d.pkg)}
           <div class="section-title">Target Ranking Keywords</div>
           ${rankList(d.keywords)}
+          <div class="section-title">Pricing Breakdown</div>
+          ${breakdownTableHTML(d.breakdownItems)}
           <div class="amount-box">
             <div class="lbl2">Total Payable</div>
             <div class="total">${fmtMoney(d.payable)}</div>
@@ -1084,6 +1326,8 @@ textarea#bulkKeywords{font-size:.85rem;}
           ${includedGrid(d.pkg)}
           <div class="section-title">Ranking Keywords</div>
           ${rankList(d.keywords)}
+          <div class="section-title">Pricing Breakdown</div>
+          ${breakdownTableHTML(d.breakdownItems)}
           <hr>
           <div class="price-summary">
             <div class="r"><span>SUBTOTAL</span><span>${fmtMoney(d.total)}</span></div>
@@ -1230,6 +1474,7 @@ textarea#bulkKeywords{font-size:.85rem;}
   // ---------- Init ----------
   renderKeywordTags();
   renderCustomFieldsUI();
+  renderBreakdownUI();
   updateCurrencyUI();
   updatePricing();
   renderPreview();
